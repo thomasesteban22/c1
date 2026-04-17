@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para mi Princesa 💜</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose:   #e07dbb;
+    --purple: #9b2fc9;
+    --light:  #f0d0ff;
+    --muted:  #b090c8;
+    --dim:    #8a5fa0;
+    --faint:  #5a3070;
+    --bg:     #0a0612;
+    --card:   rgba(40,12,65,0.72);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: #f5e6f0;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+  .footer-img {
+    width: 100%;
+    max-width: 420px;   /* opcional: evita que sea gigante en pantallas grandes */
+    height: auto;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    object-fit: cover;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  /* ─── STARFIELD ─── */
+  #stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 50% 0%, #1a0830 0%, #0a0612 68%);
+  }
+  .star {
+    position: absolute; border-radius: 50%; background: #fff;
+    opacity: 0; animation: twinkle var(--d) ease-in-out infinite var(--delay);
+  }
+  @keyframes twinkle {
+    0%,100%{ opacity:0; transform:scale(1) }
+    50%    { opacity:var(--op); transform:scale(1.4) }
+  }
+
+  /* ─── FLOATING HEARTS ─── */
+  .heart-float {
+    position: fixed; pointer-events: none; z-index: 1;
+    animation: floatUp 6s ease-in forwards;
+  }
+  @keyframes floatUp {
+    0%  { transform:translateY(0) scale(1); opacity:1 }
+    100%{ transform:translateY(-105vh) scale(0.3) rotate(25deg); opacity:0 }
+  }
+
+  /* ─── ENVELOPE INTRO ─── */
+  #envelope-scene {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: #0a0612;
+    transition: opacity .9s ease, visibility .9s ease;
+  }
+  #envelope-scene.hidden { opacity:0; visibility:hidden; }
+
+  .env-wrap { position:relative; cursor:pointer; }
+
+  .env-body {
+    width: 240px; height: 155px;
+    background: linear-gradient(135deg, #2d1040 55%, #4a1a6e);
+    border-radius: 6px;
+    border: 1.5px solid #c97de0;
+    position: relative;
+    box-shadow: 0 0 60px #8b1fc835, 0 0 120px #6b10a820;
+    transition: box-shadow .4s;
+  }
+  .env-wrap:hover .env-body {
+    box-shadow: 0 0 80px #9b2fc960, 0 0 160px #6b10a840;
+  }
+
+  .env-flap {
+    position: absolute; top: 0; left: -1px; right: -1px; height: 78px;
+    background: linear-gradient(to bottom, #3d1555, #2d1040);
+    clip-path: polygon(0 0, 50% 58%, 100% 0);
+    transform-origin: top center;
+    transition: transform .7s cubic-bezier(.4,0,.2,1);
+    border-top: 1.5px solid #c97de0;
+  }
+  .env-wrap:hover .env-flap { transform: rotateX(-170deg); }
+
+  .env-seal {
+    position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #9b2fc9; border: 2px solid #e0a0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; z-index: 2;
+    animation: pulse-seal 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse-seal {
+    0%,100%{ box-shadow:0 0 0 0 #9b2fc940 }
+    50%    { box-shadow:0 0 0 12px #9b2fc900 }
+  }
+
+  .env-label {
+    position: absolute; bottom: 22px; width: 100%; text-align: center;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 14px; color: #e0b8f0; letter-spacing: 1.5px;
+  }
+
+  .env-hint {
+    margin-top: 28px; font-size: 12px; color: #9a70b0;
+    animation: blink 2s ease-in-out infinite;
+    letter-spacing: 3px; text-transform: uppercase;
+  }
+  @keyframes blink { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+  /* ─── MAIN CONTENT ─── */
+  #main {
+    position: relative; z-index: 10;
+    max-width: 720px; margin: 0 auto;
+    padding: 64px 24px 90px;
+    opacity: 0; transition: opacity 1.4s ease .4s;
+  }
+  #main.visible { opacity: 1; }
+
+  /* ─── HEADER ─── */
+  .header { text-align: center; margin-bottom: 72px; }
+  .header-eyebrow {
+    font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 18px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(34px, 7vw, 58px);
+    font-weight: 400; color: var(--light);
+    text-shadow: 0 0 50px #c97de045;
+    line-height: 1.15; margin-bottom: 18px;
+  }
+  .header-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .orn-line { flex: 1; max-width: 80px; height: 1px;
+    background: linear-gradient(to right, transparent, #9b5fc0, transparent); }
+  .orn-gem { font-size: 14px; }
+
+  /* ─── LETTER ─── */
+  .letter-card {
+    background: var(--card);
+    border: 1px solid rgba(180,100,220,.22);
+    border-radius: 18px; padding: 44px 40px;
+    margin-bottom: 56px;
+    backdrop-filter: blur(12px);
+    position: relative; overflow: hidden;
+  }
+  .letter-card::after {
+    content: '';
+    position: absolute; bottom: -80px; left: -60px;
+    width: 240px; height: 240px; border-radius: 50%;
+    background: radial-gradient(circle, #6b1fa025 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .letter-greeting {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 24px; color: #e8c0f8; margin-bottom: 24px;
+  }
+  .letter-body { font-size: 15.5px; line-height: 2; color: #d0b0e8; }
+  .letter-body p { margin-bottom: 20px; }
+  .letter-body p:last-child { margin-bottom: 0; }
+  .letter-sign {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 19px; color: #e8c0f8;
+    margin-top: 36px; text-align: right;
+  }
+
+  /* ─── SECTION LABEL ─── */
+  .section-label {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 22px; text-align: center;
+  }
+
+  /* ─── CAROUSEL ─── */
+  .carousel-section { margin-bottom: 56px; }
+
+  .carousel-outer {
+    position: relative;
+    border-radius: 18px;
+    border: 1px solid rgba(180,100,220,.2);
+    overflow: hidden;
+    box-shadow: 0 8px 40px #1a003040;
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform .55s cubic-bezier(.4,0,.2,1);
+    will-change: transform;
+  }
+
+  /* ── Each slide ── */
+  .carousel-slide {
+    min-width: 100%;
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  /* ── Photo placeholder / real photo ── */
+  .slide-photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Si no hay foto real, se muestra el fondo de placeholder */
+    background: linear-gradient(135deg, #1a0630 0%, #3a1260 100%);
+  }
+
+  /* Placeholder icon (solo visible si no hay <img>) */
+  .slide-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+  }
+  .ph-icon  { font-size: 48px; opacity: .35; line-height: 1; }
+  .ph-label {
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(220,180,255,.4);
+  }
+
+  /* Gradient overlay so text is always readable */
+  .slide-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(8,2,18,.85) 0%,
+      rgba(8,2,18,.45) 45%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Text block pinned to bottom */
+  .slide-text {
+    position: relative; z-index: 3;
+    padding: 28px 28px 22px;
+    text-align: left;
+    width: 100%;
+  }
+  .slide-caption {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: clamp(17px, 3.5vw, 22px);
+    color: #f0d8ff; line-height: 1.35;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px #00000060;
+  }
+  .slide-sub {
+    font-size: 13px; color: rgba(200,160,230,.75);
+    line-height: 1.6; max-width: 420px;
+    text-shadow: 0 1px 6px #00000060;
+  }
+
+  /* Nav buttons */
+  .carousel-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(80,20,120,.65);
+    border: 1px solid rgba(200,120,240,.35);
+    color: #e8c0f8; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10; transition: background .2s, transform .15s;
+    line-height: 1; backdrop-filter: blur(4px);
+  }
+  .carousel-btn:hover {
+    background: rgba(130,40,190,.8);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .carousel-btn:active { transform: translateY(-50%) scale(.94); }
+  .carousel-btn.prev { left: 12px; }
+  .carousel-btn.next { right: 12px; }
+
+  /* Progress bar */
+  .carousel-progress {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: rgba(255,255,255,.08); z-index: 10;
+  }
+  .carousel-bar {
+    height: 100%; width: 0;
+    background: linear-gradient(to right, #9b2fc9, #e07dbb);
+    transition: width .4s ease;
+  }
+
+  /* Dots */
+  .carousel-dots {
+    display: flex; justify-content: center;
+    align-items: center; gap: 7px; margin-top: 16px;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--faint); cursor: pointer;
+    transition: all .3s; border: none; padding: 0;
+  }
+  .dot.active { background: var(--purple); transform: scale(1.5); }
+
+  /* ─── REASONS ─── */
+  .reasons-section { margin-bottom: 56px; }
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .reason-card {
+    background: var(--card);
+    border: 1px solid rgba(180,100,220,.18);
+    border-radius: 14px; padding: 22px 16px;
+    text-align: center; cursor: pointer;
+    transition: transform .25s, border-color .25s, background .25s;
+    position: relative; overflow: hidden;
+  }
+  .reason-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(180,100,220,.55);
+    background: rgba(80,20,110,.75);
+  }
+  .reason-card.lit { animation: light-up .5s ease forwards; }
+  @keyframes light-up {
+    0%  { box-shadow: 0 0 0  #b060e0 }
+    50% { box-shadow: 0 0 28px #b060e055 }
+    100%{ box-shadow: 0 0 0  #b060e0 }
+  }
+  .reason-emoji { font-size: 28px; margin-bottom: 8px; line-height: 1; }
+  .reason-text  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  #reason-msg {
+    text-align: center; margin-top: 18px; min-height: 26px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 15px; color: #d090e8;
+    transition: opacity .4s; opacity: 0;
+  }
+
+  /* ─── LOVE COUNTER ─── */
+  .love-section {
+    background: var(--card);
+    border: 1px solid rgba(180,100,220,.2);
+    border-radius: 18px; padding: 36px 28px;
+    margin-bottom: 56px; text-align: center;
+  }
+  .love-title {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 20px; color: #e8c0f8; margin-bottom: 6px;
+  }
+  .love-sub { font-size: 13px; color: var(--dim); margin-bottom: 24px; }
+
+  .heart-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, #7b1fa2, #b039d4);
+    border: none; border-radius: 50px; padding: 15px 36px;
+    color: #fff; font-family: 'Lato', sans-serif;
+    font-size: 14px; letter-spacing: 1px; cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 28px #9b2fc938;
+  }
+  .heart-btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 36px #9b2fc968;
+  }
+  .heart-btn:active { transform: scale(.97); }
+  .hb-icon { font-size: 22px; animation: hb 1.2s ease-in-out infinite; }
+  @keyframes hb {
+    0%,100%{ transform:scale(1)   }
+    15%    { transform:scale(1.35) }
+    30%    { transform:scale(1)   }
+    45%    { transform:scale(1.18) }
+    60%    { transform:scale(1)   }
+  }
+
+  #love-counter {
+    margin-top: 18px;
+    font-family: 'Playfair Display', serif;
+    font-size: 36px; color: var(--light);
+    transition: transform .15s;
+  }
+  #love-counter.bounce { transform: scale(1.3); }
+  .counter-sub { font-size: 12px; color: var(--faint); letter-spacing: 2px; margin-top: 6px; }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    text-align: center; padding-top: 36px;
+    border-top: 1px solid rgba(180,100,220,.12);
+  }
+  .footer-quote {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 17px; color: var(--dim); line-height: 1.8;
+  }
+  .footer-heart { font-size: 24px; margin-top: 18px; animation: hb 1.8s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- ═══════════════════ ENVELOPE INTRO ═══════════════════ -->
+<div id="envelope-scene">
+  <div class="env-wrap" id="env-btn" title="Toca para abrir">
+    <div class="env-body">
+      <div class="env-flap"></div>
+      <div class="env-seal">💜</div>
+      <div class="env-label">Para mi esposa</div>
+    </div>
+  </div>
+  <div class="env-hint">Toca para abrir</div>
+</div>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div id="main">
+
+  <div class="header">
+    <div class="header-eyebrow">Una carta con mucho amor de tu ingeniero</div>
+    <h1 class="header-title">Para mi princesa de cuento de hadas</h1>
+    <div class="header-ornament">
+      <div class="orn-line"></div>
+      <span class="orn-gem">💜</span>
+      <div class="orn-line"></div>
+    </div>
+  </div>
+
+  <!-- ── CARTA ── -->
+  <div class="letter-card">
+    <div class="letter-greeting">Mi esposa hermosa,</div>
+    <div class="letter-body">
+      <p>Mucho mas allá de lo que pueda escribir o decir, quiero hacerte sentir tan especial como tu me haces sentir a mi, eres el amor de mi vida y quien se merece todo mi amor.</p>
+      <p>Desde que llegaste a mi vida, he tenido a mi niña consentida, la mujer de mis sueños, mi mejor amiga, mi manager, mi tesoro y mi razón de querer cumplir todas mis metas acompañado de ti.</p>
+      <p>Gracias por tu paciencia, por tu cariño, por ser tú en cada versión tuya. Gracias por dejarme estar a tu lado y disculpame por a veces ser tan rabioso o grosero, nunca dejaré que eso dañe nuestro hermoso amor.</p>
+      <p>Te amo más de lo que sé expresar, pero voy a seguir intentándolo cada día, porque quiero estar contigo hasta el fin del universo.</p>
+    </div>
+    <div class="letter-sign">Con todo mi amor por ti mi bebé 💜</div>
+  </div>
+
+  <!-- ── CARRUSEL ── -->
+  <div class="carousel-section">
+    <div class="section-label">Algunos momentitos juntos</div>
+
+    <div class="carousel-outer">
+      <div class="carousel-track" id="track">
+
+
+
+
+        <!-- SLIDE 1 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f1.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">De escapadita con mi bebé</div>
+            <div class="slide-sub">Porque cada viajecito y escapadita se transformen en recuerdos hermosos para los dos.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="carousel-slide">
+          <!-- ← CAMBIA AQUÍ: reemplaza este bloque por <img class="slide-photo" src="foto2.jpg" alt="..." /> -->
+          <img class="slide-photo" src="f2.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Contigo le encontre el sentido y el amor a tomarme fotos</div>
+            <div class="slide-sub">Esa carita hermosa que tienes me hace sentir en la luna y querer capturar cada pequeño recuerdo.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f3.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Momentos que atesoro junto a mi amor</div>
+            <div class="slide-sub">Pienso que juntos nos vemos hermosos y somos una pareja como ninguna.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 4 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f4.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Contigo el mundo es más bonito</div>
+            <div class="slide-sub">Cada lugar al que vamos se convierte en algo mucho mas maravilloso a tu <lado></lado>.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 5 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f5.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Te amo mi amor, eres mi sueño echo realidad</div>
+            <div class="slide-sub">Cuando agarro tu manita me siento tan feliz.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 6 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f6.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Mi persona favorita</div>
+            <div class="slide-sub">Sin importar qué pase, siempre quiero estar a tu lado.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 7 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f7.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Todo tuyo mi corazón de melón</div>
+            <div class="slide-sub">Elegirte fue la decisión más hermosa y más importante que he tomado.</div>
+          </div>
+        </div>
+
+        <!-- SLIDE 8 -->
+        <div class="carousel-slide">
+          <img class="slide-photo" src="f8.jpeg" alt="descripción" />
+          <div class="slide-overlay"></div>
+          <div class="slide-text">
+            <div class="slide-caption">Todo lo que viene</div>
+            <div class="slide-sub">Cuando pienso en el futuro, te veo a ti. Eso es lo más bonito que tengo, te adoro mi futura esposa</div>
+          </div>
+        </div>
+
+      </div><!-- /track -->
+
+      <button class="carousel-btn prev" id="prev" aria-label="Anterior">‹</button>
+      <button class="carousel-btn next" id="next" aria-label="Siguiente">›</button>
+      <div class="carousel-progress"><div class="carousel-bar" id="bar"></div></div>
+    </div><!-- /carousel-outer -->
+
+    <div class="carousel-dots" id="dots"></div>
+  </div><!-- /carousel-section -->
+
+  <!-- ── RAZONES ── -->
+  <div class="reasons-section">
+    <div class="section-label">Por qué te amo — oprime una mi chiquitina</div>
+    <div class="reasons-grid">
+      <div class="reason-card" data-msg="Como no voy a estar enamorado si desde que te escuché por primera vez me cautivaste 🌟"><div class="reason-emoji">🥰</div><div class="reason-text">Tu hermosa voz</div></div>
+      <div class="reason-card" data-msg="Tu corazón es noble, amoroso y comprensivo"><div class="reason-emoji">🩵</div><div class="reason-text">Tu corazón de melocotón</div></div>
+      <div class="reason-card" data-msg="Eres inquebrantable y se que puedes con todo mi vida hermosa"><div class="reason-emoji">💪</div><div class="reason-text">Tu fortaleza</div></div>
+      <div class="reason-card" data-msg="Si vieras como hablo de lo inteligente que es mi mujer y lo interesante e inteligente que eres"><div class="reason-emoji">🧠</div><div class="reason-text">Tu inteligencia</div></div>
+      <div class="reason-card" data-msg="Eres tan consentida, tan cariñosa, tan tierna y a la ves tan madura y fuerte que me encantas"><div class="reason-emoji">🤵👰</div><div class="reason-text">Tu forma de ser conmigo</div></div>
+      <div class="reason-card" data-msg="Me haces mejor persona cada día mi amor y espero inspirarte como tu lo haces conmigo 🌿"><div class="reason-emoji">😁</div><div class="reason-text">Lo que me inspiras</div></div>
+    </div>
+    <div id="reason-msg"></div>
+  </div>
+
+  <!-- ── CONTADOR DE AMOR ── -->
+  <div class="love-section">
+    <div class="love-title">Cuánto te amo</div>
+    <div class="love-sub">Toca el corazón para saberlo</div>
+    <button class="heart-btn" id="love-btn">
+      <span class="hb-icon">💜</span>
+      <span>Toca aquí</span>
+    </button>
+    <div id="love-counter">0</div>
+    <div class="counter-sub">veces te amo hoy</div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <img class="footer-img" src="s1.jpeg" alt="descripción" />
+    <div class="footer-quote">Siempre te voy a elegir a ti</div>
+    <div class="footer-heart">🩵</div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ─── STARS ─── */
+(function(){
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.6 + 0.4;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      --d:${2+Math.random()*5}s;
+      --delay:-${Math.random()*7}s;
+      --op:${0.25+Math.random()*0.75};
+    `;
+    c.appendChild(s);
+  }
+})();
+
+/* ─── FLOATING HEARTS ─── */
+function spawnHearts(n) {
+  const syms = ['💜','🌸','✨','💫','🌙','🌺'];
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'heart-float';
+      h.textContent = syms[Math.floor(Math.random() * syms.length)];
+      h.style.cssText = `
+        left:${Math.random()*96}vw; bottom:0;
+        font-size:${14+Math.random()*18}px;
+        animation-duration:${4+Math.random()*4}s;
+      `;
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 9000);
+    }, i * 100);
+  }
+}
+
+/* ─── ENVELOPE ─── */
+document.getElementById('env-btn').addEventListener('click', function() {
+  document.getElementById('envelope-scene').classList.add('hidden');
+  document.getElementById('main').classList.add('visible');
+  spawnHearts(14);
+});
+
+/* ─── CAROUSEL ─── */
+const TOTAL = document.querySelectorAll('.carousel-slide').length;
+const track = document.getElementById('track');
+const bar   = document.getElementById('bar');
+const dotsW = document.getElementById('dots');
+let cur = 0, timer;
+
+// build dots
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('button');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.setAttribute('aria-label', 'Ir a ' + (i+1));
+  d.addEventListener('click', () => goTo(i));
+  dotsW.appendChild(d);
+}
+
+function goTo(n) {
+  cur = ((n % TOTAL) + TOTAL) % TOTAL;
+  track.style.transform = `translateX(-${cur * 100}%)`;
+  bar.style.width = `${((cur + 1) / TOTAL) * 100}%`;
+  dotsW.querySelectorAll('.dot').forEach((d, i) =>
+    d.classList.toggle('active', i === cur));
+  resetTimer();
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timer = setInterval(() => goTo(cur + 1), 10000);
+}
+
+document.getElementById('prev').addEventListener('click', () => goTo(cur - 1));
+document.getElementById('next').addEventListener('click', () => goTo(cur + 1));
+
+// touch swipe
+let tx = 0;
+track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+track.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 40) goTo(cur + (dx < 0 ? 1 : -1));
+});
+
+goTo(0); // init
+
+/* ─── REASONS ─── */
+const msgEl = document.getElementById('reason-msg');
+document.querySelectorAll('.reason-card').forEach(card => {
+  card.addEventListener('click', function() {
+    msgEl.style.opacity = '0';
+    setTimeout(() => {
+      msgEl.textContent = this.dataset.msg;
+      msgEl.style.opacity = '1';
+    }, 200);
+    this.classList.remove('lit');
+    void this.offsetWidth;
+    this.classList.add('lit');
+    spawnHearts(4);
+  });
+});
+
+/* ─── LOVE COUNTER ─── */
+let count = 0;
+const counter = document.getElementById('love-counter');
+const specials = {
+  5:  'Un poquito más cada segundo',
+  10: 'Infinitamente mi amor',
+  15: 'Cada día te amo más',
+  20: 'Eres mi felicidad',
+  25: '¡Para siempre!',
+  30: 'Mi lugar favorito es contigo',
+  40: 'No hay límites para nuestro amor',
+  50: 'Sin límites',
+  60: 'Eres mi todo',
+  75: 'Mi universo eres tú',
+  100:'¡Eternamente te voy a amar mi bebé!',
+  110:'Más allá del tiempo',
+  130:'Mi vida entera contigo',
+  140:'Quiero que te sientas amada cada vez mas',
+  160:'Eres mi destino y mi tesoro',
+  180:'Te amo en todas las vidas'
+};
+document.getElementById('love-btn').addEventListener('click', function() {
+  count++;
+  counter.textContent = specials[count] || count;
+  counter.classList.remove('bounce');
+  void counter.offsetWidth;
+  counter.classList.add('bounce');
+  setTimeout(() => counter.classList.remove('bounce'), 200);
+  spawnHearts(3);
+});
+</script>
+</body>
+</html>
